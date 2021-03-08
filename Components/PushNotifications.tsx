@@ -35,10 +35,13 @@ async function enablePush() {
     console.error("Service workers are not supported in this browser");
   }
 }
-async function testPush() {
-  await fetch("/push", {
+async function testPush(title: string, body: string) {
+  await fetch("/api/test", {
     method: "POST",
-    body: JSON.stringify({}),
+    body: JSON.stringify({
+      title,
+      body
+    }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -54,13 +57,26 @@ async function serviceWorkerInstall () {
 }
 
 export const Notifications: React.FC = () => {
+  const [title, setTitle] = React.useState('')
+  const [body, setBody] = React.useState('')
   React.useEffect(() => {
     serviceWorkerInstall()
   }, [])
   return (
     <div>
       <button onClick={enablePush}>Subscribe to push notifications</button>
-      <button onClick={testPush}>test to push notifications</button>
+      <div>
+        <h2>Send test notifications to all subscriptions</h2>
+        <label htmlFor='title'>title:</label>
+        <input id='title' value={title} onChange={e => setTitle(e.target.value)} />
+
+        <label htmlFor='body'>body:</label>
+        <input id='body' value={body} onChange={e => setBody(e.target.value)} />
+        <button onClick={() => {
+          testPush(title, body)
+        }}>Send</button>
+      </div>
+      
     </div>
   );
 };
